@@ -68,3 +68,17 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `yarn build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+
+### INSTALL node moduls and get react app aligned to your local ver
+yarn install
+yarn upgrade --latest react-scripts
+
+### if you run over docker:
+// first time you have to create and run
+sudo docker run -it --name node_js -v /home/ymalafeiev/Develop/NodejsReact/NodeJS-React/:/project -p 3000:3000  node bash
+// then just start
+sudo docker start -i node_js
+// over bash console move to /project/react and yarn start 
+// on host machine
+http://localhost:3000
