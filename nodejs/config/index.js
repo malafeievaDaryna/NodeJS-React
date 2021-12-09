@@ -1,4 +1,4 @@
-var configValues = require('./config');
+const configValues = require('./config');
 
 module.exports = {
     

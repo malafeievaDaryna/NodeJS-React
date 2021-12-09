@@ -1,19 +1,27 @@
-var express = require('express');
-var bodyparser = require('body-parser')
-var app = express();
-var mongoose = require('mongoose');
-var config = require('./config');
-var setupController = require('./controllers/setupController');
-var productControllerAPI = require('./controllers/productController');
-var port = /*process.env.PORT ||*/ 8080;
-var cors = require('cors');
+const express = require('express');
+const bodyparser = require('body-parser');
+const app = express();
+const mongoose = require('mongoose');
+const config = require('./config');
+const setupController = require('./controllers/setupController');
+const productControllerAPI = require('./controllers/productController');
+const port = /*process.env.PORT ||*/ 8080;
+const cors = require('cors');
+
+require('./services/cacher');
 
 // grant the access to frontend-server
 // https://stackoverflow.com/questions/18310394/no-access-control-allow-origin-node-apache-port-issue
 /*
     // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+app.all('/*', function(req, res, next) {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader('Access-Control-Allow-Headers', 'origin, content-type, accept');
+    res.setHeader("Access-Control-Allow-Methods", "*");
+    next();
+});
 */
+
 app.use(cors({origin: 'http://localhost:3000'}));
 app.use(bodyparser.json())
 //body text type expected with pairs key-value

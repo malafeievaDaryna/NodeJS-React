@@ -1,7 +1,7 @@
-var express = require('express');
-var product = require('../models/productModel');
+const express = require('express');
+const product = require('../models/productModel');
 
-var router = express.Router();
+const router = express.Router();
 
 router.get("/", (req, res) => {
     product.find({}, function (err, results) {
@@ -10,10 +10,9 @@ router.get("/", (req, res) => {
     });
 })
 
-router.get("/:id", (req, res) => {
-    product.find({id: req.params.id}, function (err, results) {
-        res.send(results);
-    });
+router.get("/:id", async (req, res) => {
+    const result = await product.find({id: req.params.id}).exec();
+    res.send(result);
 })
 
 router.post("/", async (req, res) => {
