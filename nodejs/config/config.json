@@ -1,4 +1,12 @@
 {
-    "uname": "sivachenkoo",
-    "pwd": "sammael_89"
+    "mongo": {
+        "uname": "sivachenkoo",
+        "pwd": "sammael_89"
+    },
+
+    "redis": {
+        "host": "172.31.223.23",
+        "port": "6379"
+    }
+    
 }

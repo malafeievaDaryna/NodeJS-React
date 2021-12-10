@@ -3,15 +3,14 @@ const product = require('../models/productModel');
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-    product.find({}, function (err, results) {
-        //console.log("get all " + JSON.stringify(results))
-        res.send(results);
-    });
+router.get("/", async (req, res) => {
+    const result = await product.find({}).exec();
+    console.log("get all " + JSON.stringify(result))
+    res.send(result);
 })
 
 router.get("/:id", async (req, res) => {
-    const result = await product.find({id: req.params.id}).exec();
+    const result = await product.findOne({id: req.params.id}).exec();
     res.send(result);
 })
 

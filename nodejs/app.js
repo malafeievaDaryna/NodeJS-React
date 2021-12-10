@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const config = require('./config');
 const setupController = require('./controllers/setupController');
 const productControllerAPI = require('./controllers/productController');
-const port = /*process.env.PORT ||*/ 8080;
+const port = 8080;
 const cors = require('cors');
 
 require('./services/cacher');
@@ -27,6 +27,7 @@ app.use(bodyparser.json())
 //body text type expected with pairs key-value
 app.use(bodyparser.urlencoded({extended:false}))
 
+console.log("mongo being connected on host :", config.getDbConnectionString())
 mongoose.connect(config.getDbConnectionString());
 //uncomment for first time initialization
 //setupController(app);
@@ -34,4 +35,5 @@ mongoose.connect(config.getDbConnectionString());
 app.use('/assets', express.static(__dirname + '/public'));
 app.use('/api/products', productControllerAPI);
 
+console.log("server is waiting for connection on port :", port)
 app.listen(port);

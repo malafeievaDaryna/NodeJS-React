@@ -1,9 +1,15 @@
 const mongoose = require("mongoose");
 const redis = require("redis");
+const configValues = require('../config/config.json');
 
 let redisClient;
 (async () => {
-    redisClient = redis.createClient();
+
+    console.log("redis being connected on host :", configValues.redis.host, " port ", configValues.redis.port)
+
+    redisClient = redis.createClient({
+        url: `redis://@${configValues.redis.host}:${configValues.redis.port}`
+      });
   
     redisClient.on('error', (err) => console.log('Redis Client Error', err));
   
@@ -23,8 +29,12 @@ mongoose.Query.prototype.exec = async function(){
 
     const cachedValue = await redisClient.get(key);
     if(cachedValue){
-        console.log(cachedValue);
-        return JSON.parse(cachedValue);
+        console.log(`cachedValue is available: ${cachedValue}`);
+        const doc = JSON.parse(cachedValue);
+
+        return Array.isArray(doc)
+            ? doc.map(d => new this.model(d))
+            : new this.model(doc);
     }
 
     const result = await originExec.apply(this, arguments);
@@ -32,6 +42,6 @@ mongoose.Query.prototype.exec = async function(){
         redisClient.set(key, JSON.stringify(result));
     }
 
-    return "ddd";//result;
+    return result;
 };
 
