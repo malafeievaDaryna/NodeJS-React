@@ -1,5 +1,7 @@
 import { Component } from "react";
+import axios from 'axios'
 
+axios.defaults.withCredentials = true
 
 class GetAll extends Component {
 
@@ -10,7 +12,6 @@ class GetAll extends Component {
 
     componentDidMount(){
         console.log("GetAll app mounted")
-        const axios = require("axios")
         axios.get("http://localhost:8080/api/products/")
         .then(res=>{
             console.log("GetAll ", res.data)
