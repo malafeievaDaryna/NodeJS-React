@@ -1,5 +1,7 @@
 import { Component } from "react";
+import axios from 'axios'
 
+axios.defaults.withCredentials = true
 
 class Get extends Component {
 
@@ -21,10 +23,9 @@ class Get extends Component {
     }
 
     getProduct(){
-        const axios = require("axios")
         axios.get("http://localhost:8080/api/products/" + this.state.id)
         .then(res=>{
-            this.setState({product:res.data[0]})
+            this.setState({product:res.data})
         })
     }
 

@@ -19,7 +19,18 @@ let redisClient;
 
 const originExec = mongoose.Query.prototype.exec;
 
+mongoose.Query.prototype.cache = function( options = {} ) {
+    this.useCache = true;
+    this.hashKey = JSON.stringify( options.key || '' );
+
+    return this;
+}
+
 mongoose.Query.prototype.exec = async function(){
+    if(!this.useCache){
+        return originExec.apply(this, arguments);
+    }
+
     console.log("I'm cacher injection");
     const key = JSON.stringify(
         Object.assign({}, 
@@ -27,7 +38,7 @@ mongoose.Query.prototype.exec = async function(){
         ));
     console.log(key);
 
-    const cachedValue = await redisClient.get(key);
+    const cachedValue = await redisClient.hGet(this.hashKey, key);
     if(cachedValue){
         console.log(`cachedValue is available: ${cachedValue}`);
         const doc = JSON.parse(cachedValue);
@@ -39,9 +50,15 @@ mongoose.Query.prototype.exec = async function(){
 
     const result = await originExec.apply(this, arguments);
     if(result){
-        redisClient.set(key, JSON.stringify(result));
+        redisClient.hSet(this.hashKey, key, JSON.stringify(result));
     }
 
     return result;
 };
+
+module.exports = {
+    clearHash(cacheKey){
+        redisClient.del(JSON.stringify(cacheKey));
+    }
+}
 

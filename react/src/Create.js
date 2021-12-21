@@ -1,5 +1,7 @@
 import { Component } from "react";
+import axios from 'axios'
 
+axios.defaults.withCredentials = true
 
 class Create extends Component {
 
@@ -29,7 +31,6 @@ class Create extends Component {
     }
 
     createProduct(){
-        const axios = require("axios")
         axios.post("http://localhost:8080/api/products/",
         {
             name: this.state.name,
