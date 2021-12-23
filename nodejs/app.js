@@ -1,12 +1,13 @@
 const express = require('express');
 const bodyparser = require('body-parser');
-
+const jwt = require('express-jwt');
 const session = require('express-session');
 ///const RedisStore = require('connect-redis')(session);
 const { v4: uuidv4 } = require('uuid');
 
 const mongoose = require('mongoose');
 const config = require('./config');
+const configValues = require('./config/config.json');
 const setupController = require('./controllers/setupController');
 const productControllerAPI = require('./controllers/productController');
 const cors = require('cors');
@@ -20,7 +21,8 @@ const { ApolloServer, gql } = require('apollo-server-express');
 const fs = require('fs');
 const typeDefs = gql(fs.readFileSync('./graphql/schema.graphql', {encoding: 'utf-8'}));
 const resolvers = require('./graphql/resolvers');
-const apolloServer = new ApolloServer({typeDefs, resolvers});
+const context = ( {req} ) => ( {sessionID:req.sessionID} );
+const apolloServer = new ApolloServer({typeDefs, resolvers, context});
 /// Required logic for integrating with Express
 apolloServer.start().then( () => {
     console.log('graphql service is available with "/graphql" postfix');
@@ -64,10 +66,30 @@ app.use(session({
     }
 }));
 
+/// Authorization header for each request will contain json web token
+app.use( jwt({
+    secret: configValues.jwt.secret,
+    credentialsRequired: false,
+    algorithms: ['HS256']
+}));
+
+app.post('/login', (req, res) => {
+    const {email, pass} = req.body;
+    //find user in db
+    if(!user){
+        res.sendStatus(401);
+        return;
+    }
+
+    const token = jwt.sign({sub: user.id}, configValues.jwt.secret);
+    res.send({token});
+});
+
 //app.use('/', function (req, res, next) {
 //    // session counter
-//    req.session.id = (req.session.id || 0) + 1;
-//    console.log('counter ', req.session.id);
+//    if(!req.user){
+//    throw new Error("Unauthorized");
+//}
 //    
 //    next();
 //})
