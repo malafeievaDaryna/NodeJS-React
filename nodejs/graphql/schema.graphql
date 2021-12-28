@@ -3,9 +3,19 @@ type Query {
     getProductById(id: ID): Product
 }
 
+type Mutation {
+    createProduct(input: CreateProductInput): Boolean
+}
+
 type Product {
     id:   ID!
     name: String,
     desc: String,
+    price: Float
+}
+
+input CreateProductInput {
+    name: String
+    desc: String
     price: Float
 }
