@@ -1,5 +1,6 @@
 import { Component } from "react";
 import axios from 'axios'
+import gql from 'graphql-tag'
 
 axios.defaults.withCredentials = true
 
@@ -22,12 +23,33 @@ class Get extends Component {
         this.setState({id:e.target.value})
     }
 
-    getProduct(){
+    async getProduct(){
+        const query = gql`
+        query GetProductById($id: ID)
+        { 
+            getProductById(id: $id){
+                price, name, desc
+                }
+        }`;
+
+        const id = this.state.id;
+
+        if(typeof this.props.apolloClient === 'undefined'){
+            console.error("error : no graphql client")
+        } else {
+            const {data: {getProductById}} = await this.props.apolloClient.query({query, variables: {id}});
+            this.setState({product:getProductById})
+        }
+    }
+
+    /**
+     * obslete Rest API functional
+     * getProduct(){
         axios.get("http://localhost:8080/api/products/" + this.state.id)
         .then(res=>{
             this.setState({product:res.data})
         })
-    }
+    }*/
 
     render(){
         return (
