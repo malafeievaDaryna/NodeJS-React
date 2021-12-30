@@ -58,6 +58,7 @@ mongoose.Query.prototype.exec = async function(){
 
 module.exports = {
     clearHash(cacheKey){
+        console.log("cache clearing " + cacheKey);
         redisClient.del(JSON.stringify(cacheKey));
     }
 }

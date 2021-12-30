@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyparser = require('body-parser');
-const jwt = require('express-jwt');
+const jwt = require('jsonwebtoken');
 const session = require('express-session');
 ///const RedisStore = require('connect-redis')(session);
 const { v4: uuidv4 } = require('uuid');
@@ -11,6 +11,7 @@ const configValues = require('./config/config.json');
 const setupController = require('./controllers/setupController');
 const productControllerAPI = require('./controllers/productController');
 const cors = require('cors');
+const user = require('./models/userModel');
 require('./services/cacher');
 
 const port = 8080;
@@ -21,7 +22,7 @@ const { ApolloServer, gql } = require('apollo-server-express');
 const fs = require('fs');
 const typeDefs = gql(fs.readFileSync('./graphql/schema.graphql', {encoding: 'utf-8'}));
 const resolvers = require('./graphql/resolvers');
-const context = ( {req} ) => ( {sessionID:req.sessionID} );
+const context = ( {req} ) => ( {sessionID: req.sessionID, user: req.user} );
 const apolloServer = new ApolloServer({typeDefs, resolvers, context});
 /// Required logic for integrating with Express
 apolloServer.start().then( () => {
@@ -66,33 +67,40 @@ app.use(session({
     }
 }));
 
-/// Authorization header for each request will contain json web token
-app.use( jwt({
-    secret: configValues.jwt.secret,
-    credentialsRequired: false,
-    algorithms: ['HS256']
-}));
-
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
     const {email, pass} = req.body;
-    //find user in db
-    if(!user){
+    console.log("login for " + email)
+    const result = await user.findOne({email: email, pass: pass}).exec();
+    if(!result){
         res.sendStatus(401);
         return;
+    } else {
+        console.log("login succeeded for " + result.email)
+        const token = jwt.sign({ user: result }, configValues.jwt.secret);
+        res.send({token});
     }
-
-    const token = jwt.sign({sub: user.id}, configValues.jwt.secret);
-    res.send({token});
 });
 
-//app.use('/', function (req, res, next) {
-//    // session counter
-//    if(!req.user){
-//    throw new Error("Unauthorized");
-//}
-//    
-//    next();
-//})
+app.use('/', function (req, res, next) {
+    console.log(" authorization triggered ");
+    if (req.headers.authorization) {
+        jwt.verify(
+          req.headers.authorization.split(' ')[1],
+          configValues.jwt.secret,
+          (err, {user}) => {
+            if(err){
+               console.log("err ", err);
+            }
+            else if (user) {
+               console.log("payload ", user);
+               req.user = user;
+            }
+          }
+        )
+    }
+    
+    next();
+})
 
 mongoose.connect(config.getDbConnectionString()).then( () => {
     console.log("mongo has been connected on host :", config.getDbConnectionString());

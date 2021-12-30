@@ -1,10 +1,11 @@
-var product = require('../models/productModel');
+const product = require('../models/productModel');
+const user = require('../models/userModel');
 
 module.exports = function (app) {
 
     app.get('/api/setupProducts', function (req, res) {
         //seed database
-        var productsItems = [
+        const productsItems = [
             
             {
                 id: 0,
@@ -20,6 +21,30 @@ module.exports = function (app) {
             }
         ];
         product.create(productsItems, function (err, results) {
+            res.send(results);
+        });
+    });
+
+    app.get('/api/setupUsers', function (req, res) {
+        //seed database
+        const usersItems = [
+            
+            {
+                id: 0,
+                name: "admin",
+                pass: "admin",
+                email: "admin@mail.ru",
+                is_admin: true
+            },
+            {
+                id: 1,
+                name: "user1",
+                pass: "user1",
+                email: "user1@mail.ru",
+                is_admin: false
+            }
+        ];
+        user.create(usersItems, function (err, results) {
             res.send(results);
         });
     });

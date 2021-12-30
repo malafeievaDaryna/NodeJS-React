@@ -21,7 +21,7 @@ class GetAll extends Component {
         if(typeof this.props.apolloClient === 'undefined'){
             console.error("error : no graphql client")
         } else {
-            const {data: {getAllProducts}} = await this.props.apolloClient.query({query});
+            const {data: {getAllProducts}} = await this.props.apolloClient.query({query, fetchPolicy: 'no-cache'});
             console.log("GetAll ", getAllProducts)
             this.setState({products:getAllProducts})
         }

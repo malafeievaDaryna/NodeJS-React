@@ -1,5 +1,6 @@
 import { Component } from "react";
 import axios from 'axios'
+import gql from 'graphql-tag'
 
 axios.defaults.withCredentials = true
 
@@ -30,6 +31,29 @@ class Create extends Component {
         this.setState({price:e.target.value})
     }
 
+    async createProduct(){
+        const mutation = gql`
+        mutation CreateProduct($input: CreateProductInput){
+           result: createProduct(input: $input) 
+        }`;
+
+        const id = this.state.id;
+
+        if(typeof this.props.apolloClient === 'undefined'){
+            console.error("error : no graphql client")
+        } else {
+            const {data: {result}} = await this.props.apolloClient.mutate({mutation, variables: { 
+                input : {
+                   name: this.state.name,
+                   desc: this.state.desc,
+                   price: parseFloat(this.state.price)
+                }
+            }});
+        }
+    }
+
+    /**
+    * obslete Rest API functional
     createProduct(){
         axios.post("http://localhost:8080/api/products/",
         {
@@ -41,6 +65,7 @@ class Create extends Component {
             console.log(res.data)
         })
     }
+    */
 
     render(){
         return (
