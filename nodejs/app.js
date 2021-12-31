@@ -95,11 +95,13 @@ app.use('/', function (req, res, next) {
                console.log("payload ", user);
                req.user = user;
             }
+            /// proceed chain of processing
+            next();
           }
         )
+    } else {
+        next();
     }
-    
-    next();
 })
 
 mongoose.connect(config.getDbConnectionString()).then( () => {

@@ -19,24 +19,24 @@ let redisClient;
 
 const originExec = mongoose.Query.prototype.exec;
 
-mongoose.Query.prototype.cache = function( options = {} ) {
+mongoose.Query.prototype.cache = function( options = {key: ''} ) {
     this.useCache = true;
-    this.hashKey = JSON.stringify( options.key || '' );
+    this.hashKey = options.key ? JSON.stringify( options.key ) : undefined;
 
     return this;
 }
 
 mongoose.Query.prototype.exec = async function(){
-    if(!this.useCache){
+    if(!this.hashKey || !this.useCache){
         return originExec.apply(this, arguments);
     }
 
-    console.log("I'm cacher injection");
+    console.log("I'm cacher injection for hashKey:", this.hashKey);
     const key = JSON.stringify(
         Object.assign({}, 
             this.getQuery(), { collection: this.mongooseCollection.name}
         ));
-    console.log(key);
+    console.log("query key:", key);
 
     const cachedValue = await redisClient.hGet(this.hashKey, key);
     if(cachedValue){

@@ -2,7 +2,7 @@ const product = require('../models/productModel');
 const {clearHash} = require('../services/cacher')
 
 const Query = {
-    getAllProducts: async (root, context) => {
+    getAllProducts: async (root, {}, context) => {
         const result = await product.find({}).cache({ key: context.sessionID }).exec();
         console.log("GraphQL get all :" + JSON.stringify(result))
         return result;
