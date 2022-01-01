@@ -1,6 +1,7 @@
 import { Component } from "react";
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
+import config from  "./config";
 
 axios.defaults.withCredentials = true
 
@@ -28,7 +29,7 @@ class Login extends Component {
     }
 
     login(){
-        axios.post("http://172.31.223.23:80/login",
+        axios.post(config.backendEndpoint + "/login",
         {
             email: this.state.email,
             pass: this.state.pass,

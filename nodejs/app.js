@@ -51,6 +51,8 @@ app.all('/*', function(req, res, next) {
 app.use(bodyparser.json())
 //body text type expected with pairs key-value
 app.use(bodyparser.urlencoded({extended:false}))
+
+// Sessions are used by default for unauthorized users
 app.use(session({
     secret:'cookieKey'+uuidv4(),
     resave: false,

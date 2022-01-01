@@ -1,34 +1,11 @@
 import './App.css';
 import {Route, Routes, Link} from "react-router-dom"
-import {ApolloClient, ApolloLink, HttpLink, InMemoryCache} from 'apollo-boost'
-import Cookies from 'js-cookie';
 import { useState } from 'react';
+import Cookies from 'js-cookie';
 import Get from './Get';
 import Create from './Create';
 import GetAll from './GetAll';
 import Login from './Login';
-
-const endpointGraphQL = "http://172.31.223.23:80/graphql";
-
-const authLink = new ApolloLink((operation, forward) => {
-  const login = Cookies.get('token');
-  if(login){
-    operation.setContext({
-      headers: {
-        'authorization': 'Bearer ' + login
-      }
-    })
-  }
-  return forward(operation);
-});
-
-const client = new ApolloClient({
-  link: ApolloLink.from([
-    authLink,
-    new HttpLink({uri: endpointGraphQL})
-  ]),
-  cache: new InMemoryCache()
-});
 
 function App() {
   
@@ -44,9 +21,9 @@ function App() {
   return (
     <div className="App">
       <Routes>
-        <Route exact path="/" element={<GetAll apolloClient={client}/>}/>
-        <Route path="/create" element={<Create apolloClient={client}/>}/>
-        <Route path="/get" element={<Get apolloClient={client}/>}/>
+        <Route exact path="/" element={<GetAll/>}/>
+        <Route path="/create" element={<Create/>}/>
+        <Route path="/get" element={<Get/>}/>
         <Route path="/login" element={<Login setToken={setToken}/>}/>
       </Routes>
       { isLoggedIn &&

@@ -1,8 +1,8 @@
 import { Component } from "react";
-import axios from 'axios'
-import gql from 'graphql-tag'
-
-axios.defaults.withCredentials = true
+import { getAllProducts } from './graphqlClient';
+///for obslete Rest Api requests
+///import axios from 'axios'
+///axios.defaults.withCredentials = true
 
 class GetAll extends Component {
 
@@ -14,16 +14,12 @@ class GetAll extends Component {
     async componentDidMount(){
         console.log("GetAll app mounted")
 
-        const query = gql`{
-            getAllProducts { name, desc, price, id }
-        }`;
-
-        if(typeof this.props.apolloClient === 'undefined'){
-            console.error("error : no graphql client")
+        const products = await getAllProducts();
+        if(products){
+            console.log(products);
+            this.setState({products: products});
         } else {
-            const {data: {getAllProducts}} = await this.props.apolloClient.query({query, fetchPolicy: 'no-cache'});
-            console.log("GetAll ", getAllProducts)
-            this.setState({products:getAllProducts})
+            console.log(" graphql getAllProducts failed ");
         }
     }
 
